@@ -1,0 +1,96 @@
+---
+
+interface Props {
+    title: string
+    subtitle: string
+    icon: string
+    description: string
+    buttonText: string
+    baseColor: 'gold' | 'navy'
+}
+
+const { title, subtitle, icon, description, buttonText, baseColor } = Astro.props
+
+let baseColorIconClass = ''
+let baseColorButtonClass = ''
+if (baseColor === 'gold') {
+  baseColorIconClass = 'from-gold-300 to-gold-500'
+  baseColorButtonClass = 'bg-gold-400 text-navy-900 hover:bg-gold-500'
+} else if (baseColor === 'navy') {
+  baseColorIconClass = 'from-navy-600 to-navy-800'
+  baseColorButtonClass = 'bg-navy-800 text-white hover:bg-navy-900'
+}
+
+---
+<style>
+    .card-float {
+          animation: float 4s ease-in-out infinite;
+          transition: all 0.4s ease;
+        }
+        .card-float:hover {
+          transform: translateY(-20px);
+          box-shadow: 0 30px 60px rgba(10, 29, 69, 0.4);
+        }
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-15px);
+          }
+        }
+    .neon-border {
+      border: 2px solid #facc15;
+      box-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .pulse-ring {
+      animation: pulse-ring 2s infinite;
+    }
+    @keyframes pulse-ring {
+      0% {
+        box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 20px rgba(250, 204, 21, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(250, 204, 21, 0);
+      }
+    }
+</style>
+
+<div class="card-float glass rounded-xl p-8 neon-border">
+  <div class="flex items-start gap-4 mb-6">
+    <div class:list={[
+        'w-16 h-16 bg-linear-to-br',
+        baseColorIconClass,
+        'rounded-lg flex items-center justify-center shrink-0 pulse-ring'
+      ]}>
+      <span class="text-2xl">{ icon }</span>
+    </div>
+    <div>
+      <h3 class="text-3xl font-black text-navy-900">
+        { title }
+      </h3>
+      <p class="text-sm text-slate-700">
+        { subtitle }
+      </p>
+    </div>
+  </div>
+  <p class="text-slate-700 mb-8 leading-relaxed">
+    { description }
+  </p>
+  <div class="flex gap-3">
+    <button class:list={[
+        'flex-1 py-3',
+        baseColorButtonClass,
+        'rounded-lg font-bold transition-all' ]}>
+      { buttonText }
+    </button>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+---
+interface Props {
+    text: string
+    seat: string
+}
+
+const { text, seat } = Astro.props
+---
+
+<button
+  onclick="selectSeat({ seat })"
+  class="px-8 py-3 bg-gold-400 text-navy-900 rounded-lg font-bold neon-border hover:shadow-lg transition-all"
+>
+  { text }
+</button>

@@ -1,0 +1,65 @@
+---
+
+import RedirectAnchorTag from '@/presentation/web/components/shared/anchor-tags/RedirectAnchorTag.astro'
+
+interface Props {
+  id: string
+  title: string
+  directions: string[]
+  phones: string[]
+  cellphones: string[]
+  email: string
+  website: string
+  hours: string
+}
+
+const { id, title, directions, phones, cellphones, email, website, hours }: Props = Astro.props
+---
+<style>
+  * {
+    scroll-behavior: smooth;
+  }
+  .neon-border {
+    border: 2px solid #facc15;
+    box-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+  }
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+</style>
+
+<div id={ id } class="glass neon-border rounded-lg p-6 hidden">
+  <h4 class="text-2xl font-black text-navy-900 mb-4">
+    { title }
+  </h4>
+  <div class="space-y-3 text-sm font-semibold text-slate-700">
+    <p>
+      📍 { directions.join(' | ') }
+    </p>
+    <p>
+      📞 { phones.join(' | ') }
+    </p>
+    <p>
+      📱 {
+        cellphones.map( cellphone => (
+          <span><RedirectAnchorTag href={`https://wa.me/${ cellphone.replace(' ', '').replace('+', '') }`}>{ cellphone }</RedirectAnchorTag> | </span>
+        ))
+      }
+    </p>
+    <p>
+      <RedirectAnchorTag href={`mailto:${ email }`}>
+        📧 { email }
+      </RedirectAnchorTag>
+    </p>
+    <p>
+      <RedirectAnchorTag href={`https://www.${ website }`}>
+        🌐 { website }
+      </RedirectAnchorTag>
+    </p>
+    <p>
+      🕐 { hours }
+    </p>
+  </div>
+</div>

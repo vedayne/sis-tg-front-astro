@@ -1,0 +1,37 @@
+---
+
+interface Props {
+  title: string
+  count: string
+}
+
+const { title, count } = Astro.props
+
+---
+
+<style>
+    .neon-border {
+      border: 2px solid #facc15;
+      box-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+    }
+    .card-float {
+      animation: float 4s ease-in-out infinite;
+      transition: all 0.4s ease;
+    }
+    .card-float:hover {
+      transform: translateY(-20px);
+      box-shadow: 0 30px 60px rgba(10, 29, 69, 0.4);
+    }
+    .stat-card {
+      background: linear-gradient(135deg, rgba(15, 44, 102, 0.8) 0%, rgba(29, 78, 216, 0.8) 100%);
+    }
+</style>
+
+<div class="stat-card rounded-lg p-6 text-white neon-border text-center card-float">
+  <div class="text-4xl font-black mb-2">
+    { count }
+  </div>
+  <p class="text-sm font-semibold">
+    { title }
+  </p>
+</div>

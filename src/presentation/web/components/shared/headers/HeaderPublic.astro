@@ -1,0 +1,52 @@
+---
+
+interface Props {
+  isLoggedOut?: boolean
+}
+
+const { isLoggedOut = true }: Props = Astro.props
+
+const informationLogo = {
+  src: '/logos/emi-logo.webp',
+  alt: 'EMI Logo',
+}
+
+---
+
+<style>
+  * {
+    scroll-behavior: smooth;
+  }
+  .neon-border {
+    border: 2px solid #facc15;
+    box-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+  }
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+</style>
+
+<header class="sticky top-0 z-50 glass border-b border-gold-400">
+  <div class="max-w-7xl mx-auto px-4 py-5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="relative w-12 h-12">
+        <div class="absolute inset-0 bg-gold-400 rounded-lg animate-pulse"></div>
+        <div class="absolute inset-1 bg-navy-900 rounded-lg flex items-center justify-center">
+          <img src={ informationLogo.src } alt={ informationLogo.alt } class="w-full h-full object-contain">
+        </div>
+      </div>
+      <div>
+        <h1 class="text-xl font-black text-navy-900">EMI SISTG</h1>
+        <p class="text-xs text-slate-700">Plataforma de Trabajos de Grado</p>
+      </div>
+    </div>
+    { isLoggedOut && (
+      <a href="/sign-in" class="px-6 py-2.5 neon-border text-navy-900 font-bold hover:bg-gold-400 hover:shadow-lg transition-all">
+        Iniciar Sesión
+      </a>
+    )}
+  </div>
+  <div class="w-full h-0.5 bg-gold-400"></div>
+</header>

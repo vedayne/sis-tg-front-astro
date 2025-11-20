@@ -1,0 +1,47 @@
+---
+import { SITE_INFO } from '@/infrastructure/config'
+import '@/presentation/assets/styles/global.css'
+
+interface Props {
+  author?: string
+  description?: string
+  image?: string
+  title?: string
+}
+
+const {
+  author = SITE_INFO.author,
+  description =  SITE_INFO.description,
+  image = SITE_INFO.image,
+  title = SITE_INFO.title,
+} = Astro.props
+
+Astro.response.headers.set( 'Cache-Control', 'no-store, must-revalidate, max-age=0' )
+Astro.response.headers.set( 'Pragma', 'no-cache' )
+Astro.response.headers.set( 'Expires', '0' )
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href={ image } />
+		<meta name="generator" content={ Astro.generator } />
+    <title> { title } </title>
+
+    <meta name="author" content={ author } />
+    <meta name="description" content={ description } />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={ title } />
+    <meta property="og:description" content={ description } />
+    <meta property="og:image" content={ image } />
+    <slot name="meta" />
+	</head>
+	<body>
+    <div class="w-full min-h-dvh bg-navy-50 text-slate-700">
+      <slot />
+    </div>
+	</body>
+</html>

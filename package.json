@@ -1,0 +1,49 @@
+{
+  "name": "sistg",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "check": "astro check",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "lint": "eslint --ext .astro .",
+    "lint:fix": "eslint --ext .astro --fix .",
+    "db:deploy": "npx prisma migrate deploy && npx prisma generate",
+    "pm2:deploy": "pm2 start ./dist/server/entry.mjs --name 'sis-tg-front'",
+    "pm2:reload": "pm2 reload 'sis-tg-front'"
+  },
+  "dependencies": {
+    "@astrojs/node": "9.4.4",
+    "@astrojs/svelte": "7.2.0",
+    "@iconify-json/mdi": "^1.2.3",
+    "@iconify-json/tabler": "^1.2.23",
+    "@iconify/svelte": "^5.0.0",
+    "@prisma/client": "^6.10.1",
+    "@tailwindcss/vite": "^4.1.5",
+    "astro": "5.14.1",
+    "astro-icon": "^1.1.5",
+    "axios": "^1.9.0",
+    "bcryptjs": "^3.0.2",
+    "canvas": "^3.1.0",
+    "form-data": "^4.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "nanostores": "^1.0.1",
+    "pdfkit": "^0.17.1",
+    "pino": "^10.0.0",
+    "sharp": "^0.34.2",
+    "svelte": "^5.28.2",
+    "tailwindcss": "^4.1.5",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/pdfkit": "^0.13.9",
+    "@typescript-eslint/parser": "^8.32.0",
+    "eslint": "^9.26.0",
+    "eslint-plugin-astro": "^1.3.1",
+    "pino-pretty": "^13.1.2",
+    "prisma": "^6.10.1"
+  }
+}

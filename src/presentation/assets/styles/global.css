@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-50: #f0f4fa;
+  --color-navy-100: #dbeafe;
+  --color-navy-200: #bfdbfe;
+  --color-navy-500: #3b82f6;
+  --color-navy-600: #2563eb;
+  --color-navy-700: #1d4ed8;
+  --color-navy-800: #0f2c66;
+  --color-navy-900: #0a1d45;
+  
+  --color-gold-300: #fde047;
+  --color-gold-400: #facc15;
+  --color-gold-500: #eab308;
+  --color-gold-600: #ca8a04;
+
+  --color-slate-50: #f8fafc;
+  --color-slate-400: #94a3b8;
+  --color-slate-700: #334155;
+}
+
+.animation-shake {
+  animation: shake 0.8s ease-in-out;
+}
+
+.animation-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animation-fade-out {
+  animation: fadeOut 0.3s ease-in-out;
+}
+
+.animation-progress-bar {
+  animation: progressBar 5s linear;
+}
+
+@font-face {
+  font-family: 'HelveticaLTStd-BoldCond';
+  src: url('/fonts/helvetica-bold-cond.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY( -20px );
+  }
+  to {
+    opacity: 1;
+    transform: translateY( 0 );
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY( 0 );
+  }
+  to {
+    opacity: 0;
+    transform: translateY( -20px );
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX( 0 );
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX( -5px );
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX( 5px );
+  }
+}
+
+@keyframes progressBar {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}

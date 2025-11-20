@@ -1,0 +1,282 @@
+---
+import LayoutPublic from '@/presentation/web/layouts/shared/LayoutPublic.astro'
+import HeaderPublic from '@/presentation/web/components/shared/headers/HeaderPublic.astro'
+import InfoCard from '@/presentation/web/components/shared/cards/InfoCard.astro'
+import StatCard from '@/presentation/web/components/shared/cards/StatCard.astro'
+import Hero from '@/presentation/web/components/shared/main/Hero.astro'
+import RepositoryCard from '@/presentation/web/components/shared/cards/RepositoryCard.astro'
+import FooterPublic from '@/presentation/web/components/shared/footers/FooterPublic.astro'
+import SeatButton from '@/presentation/web/components/shared/buttons/SeatButton.svelte'
+import ContainerMap from '@/presentation/web/components/shared/main/ContainerMap.astro'
+import ContainerMapInteractive from '@/presentation/web/components/shared/main/ContainerMapInteractive.svelte'
+import SeatEspecifiedButton from '@/presentation/web/components/shared/main/SeatEspecifiedButton.svelte'
+
+export const prerender = true
+
+interface InfoCardsProps {
+  id: string
+  title: string
+  directions: string[]
+  phones: string[]
+  cellphones: string[]
+  email: string
+  website: string
+  hours: string
+}
+
+const infoCards: InfoCardsProps[] = [
+  {
+    id: 'seat-La Paz',
+    title: 'LA PAZ',
+    directions: ['Av. Rafael Pabón, zona de Irpavi', 'C. Las Retamas, zona Alto Irpavi', 'Av. Arce No. 2642'],
+    phones: ['+591 2775536', '+591 2799505'],
+    cellphones: ['+591 71223204'],
+    email: 'lapaz@adm.emi.edu.bo',
+    website: 'emi.edu.bo',
+    hours: 'Lun-Vie 08:00 - 16:00'
+  },
+  {
+    id: 'seat-Cochabamba',
+    title: 'COCHABAMBA',
+    directions: ['Av. Lanza entre Oruro y La Paz', 'Av. 23 de Marzo, Zona Muyurina'],
+    phones: ['+591 4531133', '+591 4530361'],
+    cellphones: ['+591 71522834', '+591 71223204'],
+    email: 'cochabamba@adm.emi.edu.bo',
+    website: 'emi.edu.bo/cbba',
+    hours: 'Lun-Vie 08:00 - 16:00'
+  },
+  {
+    id: 'seat-Santa Cruz',
+    title: 'SANTA CRUZ',
+    directions: ['Tercer Anillo Radial 13'],
+    phones: ['+591 3527431', '+591 3579545'],
+    cellphones: ['+591 71566652'],
+    email: 'santacruz@adm.emi.edu.bo',
+    website: 'emi.edu.bo',
+    hours: 'Lun-Vie 08:00 - 16:00'
+  },
+  {
+    id: 'seat-Riberalta',
+    title: 'RIBERALTA',
+    directions: ['Nicanor Salvatierra N° 154 - Barrio La Cruz'],
+    phones: ['+591 8524373'],
+    cellphones: ['+591 71564887'],
+    email: 'riberalta@adm.emi.edu.bo',
+    website: 'emi.edu.bo',
+    hours: 'Lun-Vie 08:00 - 16:00'
+  },
+  {
+    id: 'seat-Tropico',
+    title: 'TROPICO',
+    directions: ['Calle Germán Bush / OTB Paraíso Distrito N° 9 - Shinahota'],
+    phones: [],
+    cellphones: ['+591 71291823', '+591 71291829'],
+    email: 'tropico@adm.emi.edu.bo',
+    website: 'emi.edu.bo',
+    hours: 'Lun-Vie 08:00 - 16:00'
+  },
+]
+---
+
+<LayoutPublic>
+    <style>
+        * {
+          scroll-behavior: smooth;
+        }
+        .neon-border {
+          border: 2px solid #facc15;
+          box-shadow: 0 0 20px rgba(250, 204, 21, 0.3);
+        }
+        .card-float {
+          animation: float 4s ease-in-out infinite;
+          transition: all 0.4s ease;
+        }
+        .card-float:hover {
+          transform: translateY(-20px);
+          box-shadow: 0 30px 60px rgba(10, 29, 69, 0.4);
+        }
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-15px);
+          }
+        }
+        .glitch {
+          position: relative;
+        }
+        .glitch::before {
+          content: attr(data-text);
+          position: absolute;
+          left: -2px;
+          top: -2px;
+          width: 100%;
+          height: 100%;
+          background: #0a1d45;
+          color: #facc15;
+          opacity: 0.8;
+          clip-path: polygon(0 0, 100% 0, 100% 1px, 0 2px);
+          animation: glitch 0.3s infinite;
+        }
+        @keyframes glitch {
+          0% {
+            clip-path: polygon(0 0, 100% 0, 100% 1px, 0 2px);
+          }
+          50% {
+            clip-path: polygon(0 10%, 100% 0, 100% 90%, 0 100%);
+          }
+        }
+        .glass {
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .hero-text {
+          background: linear-gradient(135deg, #0a1d45 0%, #1d4ed8 50%, #facc15 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .pulse-ring {
+          animation: pulse-ring 2s infinite;
+        }
+        @keyframes pulse-ring {
+          0% {
+            box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7);
+          }
+          70% {
+            box-shadow: 0 0 0 20px rgba(250, 204, 21, 0);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(250, 204, 21, 0);
+          }
+        }
+        .grid-bg {
+          background-image: linear-gradient(rgba(250, 204, 21, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(250, 204, 21, 0.1) 1px, transparent 1px);
+          background-size: 40px 40px;
+        }
+        .stat-card {
+          background: linear-gradient(135deg, rgba(15, 44, 102, 0.8) 0%, rgba(29, 78, 216, 0.8) 100%);
+        }
+    </style>
+    <!-- HEADER FUTURISTA -->
+    <HeaderPublic />
+
+    <!-- HERO FUTURISTA -->
+    <section class="grid-bg min-h-screen flex items-center justify-center px-4 py-20">
+        <div class="max-w-5xl w-full">
+            <Hero />
+
+            <!-- CTA BUTTONS -->
+            <div class="flex gap-6 justify-center flex-wrap mb-20">
+                <a href="/sign-in" class="px-10 py-4 bg-linear-to-r from-gold-400 to-gold-500 text-navy-900 rounded-lg font-black text-lg hover:shadow-2xl hover:scale-105 transition-all neon-border">
+                    ACCEDER AHORA
+                </a>
+                <button onclick="document.getElementById('reposSection').scrollIntoView()" class="px-10 py-4 border-2 border-navy-800 text-navy-900 rounded-lg font-black text-lg hover:bg-navy-900 hover:text-gold-400 transition-all">
+                    EXPLORAR
+                </button>
+            </div>
+
+            <!-- STATS CARDS -->
+            <div class="grid md:grid-cols-3 gap-6">
+                <StatCard title="Trabajos Indexados" count="15K+" />
+                <StatCard title="Usuarios Activos" count="3K+" />
+                <StatCard title="Carreras" count="15+" />
+            </div>
+        </div>
+    </section>
+
+    <!-- REPOSITORIOS FUTURISTA -->
+    <section id="reposSection" class="py-24 px-4 bg-linear-to-b from-navy-50 to-navy-100">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-5xl md:text-6xl font-black text-navy-900 mb-4 text-center">REPOSITORIOS</h2>
+            <div class="w-24 h-1 gold-accent mx-auto rounded-full mb-16"></div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- CARD GRADO -->
+                <RepositoryCard title="GRADO" subtitle="Trabajos de Licenciatura" icon="📚" description="Colección completa de trabajos de grado. Búsqueda avanzada por carrera, autor, año y palabras clave. Descarga en múltiples formatos. Referencias académicas completas." buttonText="EXPLORAR" baseColor="gold" />
+                <!-- CARD POSTGRADO -->
+                <RepositoryCard title="POSTGRADO" subtitle="Maestrías y Doctorados" icon="🎓" description="Investigaciones avanzadas. Base de datos especializada en tesis de postgrado. Acceso a artículos, datasets y conclusiones. Colaboración internacional." buttonText="EXPLORAR" baseColor="navy" />
+            </div>
+        </div>
+    </section>
+
+    <!-- SEDES CON MAPA -->
+    <section class="py-24 px-4">
+        <div class="w-full">
+            <h2 class="text-5xl md:text-6xl font-black text-navy-900 mb-4 text-center">UBICACIONES</h2>
+            <div class="w-24 h-1 gold-accent mx-auto rounded-full mb-16"></div>
+            <!-- SEAT BUTTONS -->
+            <div class="flex gap-4 justify-center my-8 flex-wrap">
+                {infoCards.map((infoCard) => (
+                <SeatButton text={infoCard.title} seat={infoCard.id.split('-')[1]} client:load/>
+                ))}
+            </div>
+            <SeatEspecifiedButton client:load/>
+            <div class="flex justify-center w-full mx-auto">
+                <ContainerMap>
+                  <ContainerMapInteractive client:load/>
+                </ContainerMap>
+            
+
+                <!-- INFO CARDS -->
+                <div class="mt-12">
+                    {infoCards.map((infoCard) => (
+                    <InfoCard
+                      id={infoCard.id}
+                      title={infoCard.title}
+                      directions={infoCard.directions}
+                      phones={infoCard.phones}
+                      cellphones={infoCard.cellphones}
+                      email={infoCard.email}
+                      website={infoCard.website}
+                      hours={infoCard.hours}
+                    />
+                    ))}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACTO -->
+    <!--section class="bg-linear-to-r from-navy-900 to-navy-800 text-white py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl font-black mb-12 text-center">SOPORTE</h2>
+            <div class="grid md:grid-cols-4 gap-6">
+                <div class="glass rounded-lg p-6 text-center neon-border">
+                    <div class="text-4xl mb-3">💬</div>
+                    <p class="font-bold">Chat</p>
+                    <p class="text-sm text-navy-100">En línea Lun-Vie</p>
+                </div>
+                <div class="glass rounded-lg p-6 text-center neon-border">
+                    <div class="text-4xl mb-3">📧</div>
+                    <p class="font-bold">Email</p>
+                    <p class="text-sm text-navy-100">soporte@emi.edu.bo</p>
+                </div>
+                <div class="glass rounded-lg p-6 text-center neon-border">
+                    <div class="text-4xl mb-3">📞</div>
+                    <p class="font-bold">Teléfono</p>
+                    <p class="text-sm text-navy-100">+591 2 2222222</p>
+                </div>
+                <div class="glass rounded-lg p-6 text-center neon-border">
+                    <div class="text-4xl mb-3">🕐</div>
+                    <p class="font-bold">Horario</p>
+                    <p class="text-sm text-navy-100">08:00 - 18:00</p>
+                </div>
+            </div>
+        </div>
+    </section-->
+
+    <!-- FOOTER -->
+    <FooterPublic />
+
+    <script>
+        import { mainSeat } from '@/presentation/web/stores/main-seat.store'
+        mainSeat.subscribe(value => {
+          document.querySelectorAll('[id^="seat-"]').forEach(el => el.classList.add('hidden'));
+          document.getElementById(`seat-${value}`)?.classList.remove('hidden');
+        })
+    </script>
+</LayoutPublic>
+

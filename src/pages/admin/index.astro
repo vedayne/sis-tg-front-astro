@@ -1,0 +1,1520 @@
+---
+import '@/presentation/assets/styles/global.css'
+
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Trabajos de Grado - EMI</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--navy-50) 0%, #f5f8fc 100%);
+            color: var(--slate-700);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            color: var(--navy-900);
+        }
+
+        /* Sidebar Estilos */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 80px;
+            height: calc(100vh - 80px);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(250, 204, 21, 0.2);
+            width: 280px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            z-index: 40;
+            box-shadow: 2px 0 15px rgba(10, 29, 69, 0.08);
+        }
+
+        .sidebar.collapsed {
+            width: 100px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 15px;
+        }
+
+        .sidebar-item {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--slate-700);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--gold-400), var(--gold-500));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(250, 204, 21, 0.1);
+            color: var(--navy-800);
+        }
+
+        .sidebar-link.active {
+            background: rgba(250, 204, 21, 0.15);
+            color: var(--navy-800);
+        }
+
+        .sidebar-link.active::before {
+            opacity: 1;
+        }
+
+        .sidebar-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-label {
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-label {
+            opacity: 0;
+            width: 0;
+            margin: 0 !important;
+        }
+
+        .sidebar-submenu {
+            list-style: none;
+            padding: 8px 0 8px 40px;
+            display: none;
+            background: rgba(15, 44, 102, 0.03);
+            border-radius: 8px;
+            margin-top: 4px;
+        }
+
+        .sidebar-submenu.active {
+            display: block;
+        }
+
+        .sidebar-submenu-item {
+            margin-bottom: 6px;
+        }
+
+        .sidebar-submenu-link {
+            display: block;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--slate-700);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-submenu-link:hover {
+            background: rgba(250, 204, 21, 0.1);
+            color: var(--navy-800);
+            padding-left: 16px;
+        }
+
+        .sidebar-submenu-link.active {
+            background: rgba(250, 204, 21, 0.15);
+            color: var(--navy-800);
+            font-weight: 600;
+        }
+
+        .expand-icon {
+            width: 16px;
+            height: 16px;
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-item.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Header Estilos */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(135deg, var(--navy-800) 0%, #0a1d45 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(250, 204, 21, 0.3);
+            z-index: 50;
+            box-shadow: 0 8px 32px rgba(10, 29, 69, 0.15);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 0 25px;
+            gap: 30px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .toggle-sidebar-btn {
+            background: rgba(250, 204, 21, 0.15);
+            border: 1px solid rgba(250, 204, 21, 0.4);
+            color: var(--gold-400);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 20px;
+        }
+
+        .toggle-sidebar-btn:hover {
+            background: rgba(250, 204, 21, 0.25);
+            transform: scale(1.05);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-img {
+            height: 50px;
+            width: auto;
+            opacity: 0.95;
+        }
+
+        .logo-text h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gold-400);
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            background: rgba(250, 204, 21, 0.1);
+            border: 1px solid rgba(250, 204, 21, 0.3);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .user-btn:hover {
+            background: rgba(250, 204, 21, 0.2);
+            border-color: rgba(250, 204, 21, 0.5);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-400), var(--gold-500));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--navy-900);
+            font-size: 16px;
+        }
+
+        .user-info {
+            text-align: left;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: rgba(250, 204, 21, 0.8);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: rgba(15, 44, 102, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(250, 204, 21, 0.3);
+            border-radius: 12px;
+            min-width: 220px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 0 12px 32px rgba(10, 29, 69, 0.2);
+        }
+
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .dropdown-item:first-child {
+            border-radius: 11px 11px 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 11px 11px;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(250, 204, 21, 0.15);
+            padding-left: 20px;
+        }
+
+        .dropdown-item.danger:hover {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            margin-left: 280px;
+            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: calc(100vh - 160px);
+            padding: 30px;
+        }
+
+        .main-content.expanded {
+            margin-left: 100px;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--navy-900);
+        }
+
+        .page-content {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(250, 204, 21, 0.15);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(10, 29, 69, 0.08);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--gold-400);
+            box-shadow: 0 4px 12px rgba(10, 29, 69, 0.06);
+        }
+
+        .content-card h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .content-card p {
+            color: var(--slate-700);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--navy-800) 0%, #0a1d45 100%);
+            color: white;
+            padding: 30px 25px;
+            text-align: center;
+            font-size: 14px;
+            border-top: 1px solid rgba(250, 204, 21, 0.2);
+            margin-left: 280px;
+            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .footer.expanded {
+            margin-left: 100px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-text {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-link {
+            color: var(--gold-400);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--gold-300);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+
+            .footer {
+                margin-left: 0;
+            }
+
+            .footer.expanded {
+                margin-left: 0;
+            }
+
+            .header-left {
+                flex: auto;
+            }
+
+            .logo-text p {
+                display: none;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .page-content {
+                padding: 20px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+
+        /* Animaciones suaves */
+        .pulse-animation {
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* Scroll suave */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(250, 204, 21, 0.3);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(250, 204, 21, 0.5);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /** para el peril */
+
+        /*body {
+            background: linear-gradient(135deg, #f0f4fa 0%, #dbeafe 50%, #f0f4fa 100%);
+            min-height: 100vh;
+        }*/
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(250, 204, 21, 0.2);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(250, 204, 21, 0.4);
+            box-shadow: 0 8px 32px rgba(250, 204, 21, 0.1);
+        }
+
+        .avatar-placeholder {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar-placeholder::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(250, 204, 21, 0.2) 0%, transparent 70%);
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .info-item {
+            border-left: 3px solid #facc15;
+            padding-left: 12px;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #facc15 0%, #eab308 100%);
+            color: #0a1d45;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(250, 204, 21, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(59, 130, 246, 0.1);
+            color: #2563eb;
+            border: 1px solid #3b82f6;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 29, 69, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(250, 204, 21, 0.3);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(10, 29, 69, 0.2);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #facc15;
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container-profile {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .profile-left {
+                width: 100%;
+            }
+
+            .profile-right {
+                width: 100%;
+            }
+
+            .modal-content {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content bg-navy-200/5">
+            <!-- Left Section -->
+            <div class="header-left">
+                <button class="toggle-sidebar-btn" id="toggleSidebar" title="Alternar sidebar">
+                    ☰
+                </button>
+                <div class="logo-section">
+                    <div class="logo-text">
+                        <h1>EMI</h1>
+                        <p>Sistema de Grados</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Section - User Dropdown -->
+            <div class="header-right">
+                <div class="user-dropdown">
+                    <button class="user-btn" id="userDropdownBtn">
+                        <div class="user-avatar">JD</div>
+                        <div class="user-info">
+                            <div class="user-name text-navy-900">Juan Díaz</div>
+                            <div class="user-role text-navy-900">Estudiante</div>
+                        </div>
+                    </button>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <button class="dropdown-item" onclick="goToPage('perfil')">
+                            👤 Configurar Perfil
+                        </button>
+                        <button class="dropdown-item danger" onclick="logout()">
+                            🚪 Cerrar Sesión
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <ul class="sidebar-menu">
+            <!-- Inicio -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link active" data-page="inicio" onclick="goToPage('inicio'); return false;">
+                    <span class="sidebar-icon">🏠</span>
+                    <span class="sidebar-label">Inicio</span>
+                </a>
+            </li>
+
+            <!-- Perfil -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link" data-page="perfil" onclick="goToPage('perfil'); return false;">
+                    <span class="sidebar-icon">👤</span>
+                    <span class="sidebar-label">Perfil</span>
+                </a>
+            </li>
+
+            <!-- Generar Reporte -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link" data-page="reporte" onclick="goToPage('reporte'); return false;">
+                    <span class="sidebar-icon">📊</span>
+                    <span class="sidebar-label">Generar Reporte</span>
+                </a>
+            </li>
+
+            <!-- Configurar Sistema (Colapsable) -->
+            <li class="sidebar-item">
+                <button class="sidebar-link" id="configBtn" onclick="toggleSubmenu(this)">
+                    <span class="sidebar-icon">⚙️</span>
+                    <span class="sidebar-label">Configurar Sistema</span>
+                    <svg class="expand-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </button>
+                <ul class="sidebar-submenu" id="configSubmenu">
+                    <li class="sidebar-submenu-item">
+                        <a href="#" class="sidebar-submenu-link" onclick="goToPage('config-tipo-miembro'); return false;">
+                            Tipo de Miembro
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="#" class="sidebar-submenu-link" onclick="goToPage('config-estudiante'); return false;">
+                            Estudiante
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="#" class="sidebar-submenu-link" onclick="goToPage('config-unidad'); return false;">
+                            Unidad Académica
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="#" class="sidebar-submenu-link" onclick="goToPage('config-rol'); return false;">
+                            Rol
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="#" class="sidebar-submenu-link" onclick="goToPage('config-fase'); return false;">
+                            Fase
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="#" class="sidebar-submenu-link" onclick="goToPage('config-gestion'); return false;">
+                            Gestión
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="#" class="sidebar-submenu-link" onclick="goToPage('config-area'); return false;">
+                            Área
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="#" class="sidebar-submenu-link" onclick="goToPage('config-semestre'); return false;">
+                            Semestre
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="#" class="sidebar-submenu-link" onclick="goToPage('config-especialidad'); return false;">
+                            Especialidad
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="#" class="sidebar-submenu-link" onclick="goToPage('config-nivel'); return false;">
+                            Nivel Académico
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Entregas -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link" data-page="entregas" onclick="goToPage('entregas'); return false;">
+                    <span class="sidebar-icon">📦</span>
+                    <span class="sidebar-label">Entregas</span>
+                </a>
+            </li>
+
+            <!-- Defensas -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link" data-page="defensas" onclick="goToPage('defensas'); return false;">
+                    <span class="sidebar-icon">🎓</span>
+                    <span class="sidebar-label">Defensas</span>
+                </a>
+            </li>
+
+            <!-- Tipo de Informe -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link" data-page="informe" onclick="goToPage('informe'); return false;">
+                    <span class="sidebar-icon">📄</span>
+                    <span class="sidebar-label">Tipo de Informe</span>
+                </a>
+            </li>
+
+            <!-- Manual de Usuario -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link" data-page="manual-usuario" onclick="goToPage('manual-usuario'); return false;">
+                    <span class="sidebar-icon">📖</span>
+                    <span class="sidebar-label">Manual de Usuario</span>
+                </a>
+            </li>
+
+            <!-- Manual de Secuencia -->
+            <li class="sidebar-item">
+                <a href="#" class="sidebar-link" data-page="manual-secuencia" onclick="goToPage('manual-secuencia'); return false;">
+                    <span class="sidebar-icon">🔄</span>
+                    <span class="sidebar-label">Manual de Secuencia</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Página: Inicio -->
+        <div id="page-inicio" class="page active">
+            <h2 class="page-title">Bienvenido, Juan Díaz</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Sistema de Gestión de Trabajos de Grado</h3>
+                    <p>Bienvenido al sistema de gestión de trabajos de grado de la EMI. Aquí puedes acceder a tus entregas, defensas, generar reportes y configurar los parámetros del sistema.</p>
+                </div>
+                <div class="content-card">
+                    <h3>Acceso Rápido</h3>
+                    <p>Utiliza la barra lateral para navegar por las diferentes secciones del sistema. Puedes acceder a tus entregas, defensas, reportes y más.</p>
+                </div>
+                <div class="content-card">
+                    <h3>Tus Estadísticas</h3>
+                    <p><strong>Entregas:</strong> 3 | <strong>Defensas Programadas:</strong> 1 | <strong>Reportes Generados:</strong> 5</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página: Perfil -->
+        <!--div id="page-perfil" class="page">
+            <h2 class="page-title">Mi Perfil</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Información Personal</h3>
+                    <p><strong>Nombre:</strong> Juan Díaz</p>
+                    <p><strong>Email:</strong> juan.diaz@emi.edu.bo</p>
+                    <p><strong>Rol:</strong> Estudiante</p>
+                    <p><strong>Carrera:</strong> Ingeniería en Sistemas</p>
+                </div>
+                <div class="content-card">
+                    <h3>Configuración de Cuenta</h3>
+                    <p>Aquí puedes cambiar tu contraseña, actualizar tu información personal y configurar preferencias de notificación.</p>
+                </div>
+            </div>
+        </div-->
+
+        <div id="page-perfil" class="page min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+            <!-- Contenedor principal -->
+            <div class="max-w-6xl mx-auto">
+                <!-- Encabezado -->
+                <div class="mb-8">
+                    <h1 class="text-4xl font-bold text-navy-900 mb-2">Mi Perfil</h1>
+                    <p class="text-navy-700 text-sm">Gestiona tu información personal y configuración de cuenta</p>
+                </div>
+    
+                <!-- Card principal del perfil -->
+                <div class="glass-card rounded-2xl p-8 md:p-12 shadow-lg">
+                    <div class="flex flex-col md:flex-row gap-8 container-profile">
+                        <!-- Lado izquierdo: Foto y nombre -->
+                        <div class="profile-left flex flex-col items-center md:items-start">
+                            <!-- Avatar -->
+                            <div class="mb-6">
+                                <div class="avatar-placeholder w-32 h-32 md:w-40 md:h-40 rounded-2xl shadow-lg">
+                                    <span id="avatarInitials">JP</span>
+                                </div>
+                                <button onclick="openModal('modalChangeFoto')" class="mt-4 w-full py-2 px-4 btn-secondary text-sm">
+                                    📷 Cambiar Foto
+                                </button>
+                            </div>
+    
+                            <!-- Información principal -->
+                            <div class="w-full md:w-auto">
+                                <h2 class="text-2xl md:text-3xl font-bold text-navy-900 mb-1" id="userName">Juan Pérez</h2>
+                                <p class="text-navy-600 font-semibold mb-4" id="userRole">Estudiante de Grado</p>
+                                <p class="text-slate-700 text-sm mb-6" id="userUnit">Ingeniería en Sistemas</p>
+                            </div>
+                        </div>
+    
+                        <!-- Lado derecho: Información detallada -->
+                        <div class="profile-right flex-1">
+                            <div class="space-y-4">
+                                <!-- Email -->
+                                <div class="info-item">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wide">Correo Personal</p>
+                                    <p class="text-navy-800 font-medium" id="userEmail">juan.perez@example.com</p>
+                                </div>
+    
+                                <!-- Email Institucional -->
+                                <div class="info-item">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wide">Correo Institucional</p>
+                                    <p class="text-navy-800 font-medium" id="userInstitutionalEmail">jp202412345@emi.edu.ec</p>
+                                </div>
+    
+                                <!-- Usuario -->
+                                <div class="info-item">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wide">Usuario</p>
+                                    <p class="text-navy-800 font-medium" id="userId">jperez2024</p>
+                                </div>
+    
+                                <!-- Carnet de Identidad -->
+                                <div class="info-item">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wide">Cédula de Identidad</p>
+                                    <p class="text-navy-800 font-medium" id="userCI">1234567890</p>
+                                </div>
+    
+                                <!-- Rol -->
+                                <div class="info-item">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wide">Rol del Sistema</p>
+                                    <p class="text-navy-800 font-medium" id="userSystemRole">Estudiante</p>
+                                </div>
+    
+                                <!-- Unidad Académica -->
+                                <div class="info-item">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wide">Unidad Académica</p>
+                                    <p class="text-navy-800 font-medium" id="userAcademicUnit">Facultad de Ingeniería</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Botones de acción -->
+                    <div class="flex flex-col sm:flex-row gap-4 mt-8 pt-8 border-t border-navy-200">
+                        <button onclick="openModal('modalEditProfile')" class="flex-1 py-2 px-4 btn-edit">
+                            ✏️ Editar Perfil
+                        </button>
+                        <button onclick="openModal('modalChangePassword')" class="flex-1 py-2 px-4 btn-secondary">
+                            🔐 Cambiar Contraseña
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- MODAL: Editar Perfil -->
+        <div id="modalEditProfile" class="modal" onclick="closeModalOnOverlay(event)">
+            <div class="modal-content">
+                <h3 class="text-2xl font-bold text-navy-900 mb-6">Editar Perfil</h3>
+                <form onsubmit="handleEditProfile(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Nombre Completo</label>
+                        <input type="text" id="editName" class="form-input" value="Juan Pérez" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Correo Personal</label>
+                        <input type="email" id="editEmail" class="form-input" value="juan.perez@example.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Cédula de Identidad</label>
+                        <input type="text" id="editCI" class="form-input" value="1234567890" required>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button type="button" onclick="closeModal('modalEditProfile')" class="flex-1 py-2 btn-secondary">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="flex-1 py-2 btn-edit">
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    
+        <!-- MODAL: Cambiar Contraseña -->
+        <div id="modalChangePassword" class="modal" onclick="closeModalOnOverlay(event)">
+            <div class="modal-content">
+                <h3 class="text-2xl font-bold text-navy-900 mb-6">Cambiar Contraseña</h3>
+                <form onsubmit="handleChangePassword(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Contraseña Actual</label>
+                        <input type="password" id="currentPassword" class="form-input" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Nueva Contraseña</label>
+                        <input type="password" id="newPassword" class="form-input" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Confirmar Nueva Contraseña</label>
+                        <input type="password" id="confirmPassword" class="form-input" required>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button type="button" onclick="closeModal('modalChangePassword')" class="flex-1 py-2 btn-secondary">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="flex-1 py-2 btn-edit">
+                            Cambiar Contraseña
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    
+        <!-- MODAL: Cambiar Foto de Perfil -->
+        <div id="modalChangeFoto" class="modal" onclick="closeModalOnOverlay(event)">
+            <div class="modal-content">
+                <h3 class="text-2xl font-bold text-navy-900 mb-6">Cambiar Foto de Perfil</h3>
+                <form onsubmit="handleChangeFoto(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-3">Seleccionar Foto</label>
+                        <input type="file" id="photoFile" class="form-input" accept="image/*" required>
+                        <p class="text-xs text-slate-400 mt-2">Formatos soportados: JPG, PNG, WebP. Tamaño máximo: 5MB</p>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button type="button" onclick="closeModal('modalChangeFoto')" class="flex-1 py-2 btn-secondary">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="flex-1 py-2 btn-edit">
+                            Subir Foto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    
+        <script is:inline>
+            // Funciones de modal
+            function openModal(modalId) {
+                document.getElementById(modalId).classList.add('active');
+            }
+    
+            function closeModal(modalId) {
+                document.getElementById(modalId).classList.remove('active');
+            }
+    
+            function closeModalOnOverlay(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.classList.remove('active');
+                }
+            }
+    
+            // Manejador: Editar Perfil
+            function handleEditProfile(event) {
+                event.preventDefault();
+                const name = document.getElementById('editName').value;
+                const email = document.getElementById('editEmail').value;
+                const ci = document.getElementById('editCI').value;
+    
+                // Actualizar UI
+                document.getElementById('userName').textContent = name;
+                document.getElementById('userEmail').textContent = email;
+                document.getElementById('userCI').textContent = ci;
+    
+                // Actualizar iniciales del avatar
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+                document.getElementById('avatarInitials').textContent = initials;
+    
+                alert('Perfil actualizado exitosamente ✓');
+                closeModal('modalEditProfile');
+            }
+    
+            // Manejador: Cambiar Contraseña
+            function handleChangePassword(event) {
+                event.preventDefault();
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+    
+                if (newPassword !== confirmPassword) {
+                    alert('Las contraseñas no coinciden ✗');
+                    return;
+                }
+    
+                if (newPassword.length < 8) {
+                    alert('La contraseña debe tener al menos 8 caracteres ✗');
+                    return;
+                }
+    
+                alert('Contraseña actualizada exitosamente ✓');
+                closeModal('modalChangePassword');
+                
+                // Limpiar formulario
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+            }
+    
+            // Manejador: Cambiar Foto
+            function handleChangeFoto(event) {
+                event.preventDefault();
+                const fileInput = document.getElementById('photoFile');
+                const file = fileInput.files[0];
+    
+                if (!file) {
+                    alert('Selecciona una foto primero ✗');
+                    return;
+                }
+    
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('La foto debe pesar menos de 5MB ✗');
+                    return;
+                }
+    
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatar = document.querySelector('.avatar-placeholder');
+                    avatar.style.backgroundImage = `url('${e.target.result}')`;
+                    avatar.style.backgroundSize = 'cover';
+                    avatar.style.backgroundPosition = 'center';
+                    avatar.textContent = ''; // Limpiar texto de iniciales
+    
+                    alert('Foto actualizada exitosamente ✓');
+                    closeModal('modalChangeFoto');
+                };
+                reader.readAsDataURL(file);
+            }
+        </script>
+
+        <!-- Página: Generar Reporte -->
+        <div id="page-reporte" class="page">
+            <h2 class="page-title">Generar Reporte</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Crear Nuevo Reporte</h3>
+                    <p>Selecciona los parámetros para generar un reporte personalizado de tus entregas, defensas o actividades académicas.</p>
+                </div>
+                <div class="content-card">
+                    <h3>Reportes Recientes</h3>
+                    <p>• Reporte de Entregas - Generado hace 5 días<br>
+                       • Reporte de Defensas - Generado hace 10 días<br>
+                       • Reporte General - Generado hace 15 días</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página: Configurar Sistema - Subpáginas -->
+        <div id="page-config-tipo-miembro" class="page">
+            <h2 class="page-title">Tipo de Miembro</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Gestionar Tipos de Miembro</h3>
+                    <p>Configure los diferentes tipos de miembros disponibles en el sistema (Estudiante, Profesor, Tribunal, etc.).</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-config-estudiante" class="page">
+            <h2 class="page-title">Configuración - Estudiante</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Gestionar Estudiantes</h3>
+                    <p>Administre la información de estudiantes, asignaciones académicas y estado de trabajos de grado.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-config-unidad" class="page">
+            <h2 class="page-title">Unidad Académica</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Gestionar Unidades Académicas</h3>
+                    <p>Configure las diferentes unidades académicas de la institución (Carreras, Departamentos, etc.).</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-config-rol" class="page">
+            <h2 class="page-title">Configuración - Rol</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Gestionar Roles</h3>
+                    <p>Administre los diferentes roles y permisos disponibles en el sistema.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-config-fase" class="page">
+            <h2 class="page-title">Fase</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Gestionar Fases</h3>
+                    <p>Configure las diferentes fases de los trabajos de grado (Propuesta, Desarrollo, Defensa, etc.).</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-config-gestion" class="page">
+            <h2 class="page-title">Gestión</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Gestionar Períodos de Gestión</h3>
+                    <p>Administre los períodos académicos disponibles en el sistema.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-config-area" class="page">
+            <h2 class="page-title">Área</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Gestionar Áreas</h3>
+                    <p>Configure las diferentes áreas de especialización dentro de las carreras.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-config-semestre" class="page">
+            <h2 class="page-title">Semestre</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Gestionar Semestres</h3>
+                    <p>Administre los semestres académicos y sus configuraciones.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-config-especialidad" class="page">
+            <h2 class="page-title">Especialidad</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Gestionar Especialidades</h3>
+                    <p>Configure las diferentes especialidades disponibles en el sistema.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-config-nivel" class="page">
+            <h2 class="page-title">Nivel Académico</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Gestionar Niveles Académicos</h3>
+                    <p>Administre los diferentes niveles académicos (Grado, Postgrado, etc.).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página: Entregas -->
+        <div id="page-entregas" class="page">
+            <h2 class="page-title">Entregas</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Mis Entregas</h3>
+                    <p><strong>Entrega 1:</strong> Propuesta - Entregado ✓</p>
+                    <p><strong>Entrega 2:</strong> Documento Parcial - Entregado ✓</p>
+                    <p><strong>Entrega 3:</strong> Documento Final - Pendiente ⏳</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página: Defensas -->
+        <div id="page-defensas" class="page">
+            <h2 class="page-title">Defensas</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Mis Defensas Programadas</h3>
+                    <p><strong>Defensa Final:</strong> 15 de Diciembre, 2024 - 2:00 PM</p>
+                    <p><strong>Sala:</strong> Aula 302 - Edificio Principal</p>
+                    <p><strong>Tribunal:</strong> Dr. García, Ing. López, M.Sc. Martínez</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página: Tipo de Informe -->
+        <div id="page-informe" class="page">
+            <h2 class="page-title">Tipo de Informe</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Tipos de Informe Disponibles</h3>
+                    <p>• Informe de Propuesta<br>
+                       • Informe Parcial<br>
+                       • Informe Final<br>
+                       • Informe de Defensa</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página: Manual de Usuario -->
+        <div id="page-manual-usuario" class="page">
+            <h2 class="page-title">Manual de Usuario</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Guía del Usuario</h3>
+                    <p><strong>1. Acceder al Sistema</strong><br>
+                       Ingresa tus credenciales de correo electrónico y contraseña en la pantalla de login.</p>
+                    <p><strong>2. Navegar por el Panel</strong><br>
+                       Utiliza la barra lateral izquierda para acceder a las diferentes secciones del sistema.</p>
+                    <p><strong>3. Generar Reportes</strong><br>
+                       Selecciona la opción "Generar Reporte" y configura los parámetros deseados.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Página: Manual de Secuencia -->
+        <div id="page-manual-secuencia" class="page">
+            <h2 class="page-title">Manual de Secuencia</h2>
+            <div class="page-content">
+                <div class="content-card">
+                    <h3>Secuencia de Procesos</h3>
+                    <p><strong>Fase 1: Propuesta</strong><br>
+                       El estudiante presenta la propuesta de su trabajo de grado.</p>
+                    <p><strong>Fase 2: Desarrollo</strong><br>
+                       El estudiante desarrolla el trabajo bajo la supervisión de tutores.</p>
+                    <p><strong>Fase 3: Defensa</strong><br>
+                       El estudiante presenta su trabajo ante un tribunal evaluador.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="footer">
+        <div class="footer-content">
+            <p class="footer-text">&copy; 2025 Sistema de Gestión de Trabajos de Grado - EMI. Todos los derechos reservados.</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">Privacidad</a>
+                <a href="#" class="footer-link">Términos</a>
+                <a href="#" class="footer-link">Contacto</a>
+            </div>
+        </div>
+    </footer>
+
+    <script is:inline>
+        // Elementos del DOM
+        /*const sidebar = document.getElementById('sidebar') as HTMLElement;
+        const mainContent = document.getElementById('mainContent') as HTMLElement;
+        const footer = document.getElementById('footer') as HTMLElement;
+        const toggleBtn = document.getElementById('toggleSidebar') as HTMLButtonElement;
+        const userDropdownBtn = document.getElementById('userDropdownBtn') as HTMLButtonElement;
+        const dropdownMenu = document.getElementById('dropdownMenu') as HTMLDivElement;
+        const configBtn = document.getElementById('configBtn') as HTMLButtonElement;
+        const configSubmenu = document.getElementById('configSubmenu') as HTMLUListElement;*/
+
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const footer = document.getElementById('footer');
+        const toggleBtn = document.getElementById('toggleSidebar');
+        const userDropdownBtn = document.getElementById('userDropdownBtn');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const configBtn = document.getElementById('configBtn');
+        const configSubmenu = document.getElementById('configSubmenu');
+
+        let sidebarCollapsed = false;
+
+        // Toggle Sidebar
+        toggleBtn.addEventListener('click', () => {
+            sidebarCollapsed = !sidebarCollapsed;
+            
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('active');
+            } else {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+                footer.classList.toggle('expanded');
+            }
+        });
+
+        // Close sidebar on mobile when clicking a link
+        document.querySelectorAll('.sidebar-link, .sidebar-submenu-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // User Dropdown Toggle
+        userDropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-dropdown')) {
+                dropdownMenu.classList.remove('active');
+            }
+        });
+
+        // Config Submenu Toggle
+        function toggleSubmenu(btn) {
+            const isExpanded = btn.parentElement.classList.contains('expanded');
+            btn.parentElement.classList.toggle('expanded');
+            configSubmenu.classList.toggle('active');
+        }
+
+        // Navigate to page
+        function goToPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            const page = document.getElementById(`page-${pageName}`);
+            if (page) {
+                page.classList.add('active');
+            }
+
+            // Update active sidebar links
+            document.querySelectorAll('.sidebar-link, .sidebar-submenu-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            const activeLink = document.querySelector(`[data-page="${pageName}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+
+            // Update config submenu if navigating to config pages
+            if (pageName.startsWith('config-')) {
+                configBtn.parentElement.classList.add('expanded');
+                configSubmenu.classList.add('active');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            alert('Sesión cerrada. Redirigiendo al login...');
+            // Aquí iría el código para redirigir al login
+            window.location.href = 'login.html';
+        }
+
+        // Handle responsive behavior
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                if (!sidebarCollapsed) {
+                    sidebar.classList.remove('collapsed');
+                    mainContent.classList.remove('expanded');
+                    footer.classList.remove('expanded');
+                }
+            }
+        });
+
+        // Initialize
+        console.log("[v0] Dashboard cargado correctamente");
+    </script>
+</body>
+</html>
