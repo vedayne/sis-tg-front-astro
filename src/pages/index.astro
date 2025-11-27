@@ -10,6 +10,10 @@ import SeatButton from '@/presentation/web/components/shared/buttons/SeatButton.
 import ContainerMap from '@/presentation/web/components/shared/main/ContainerMap.astro'
 import ContainerMapInteractive from '@/presentation/web/components/shared/main/ContainerMapInteractive.svelte'
 import SeatEspecifiedButton from '@/presentation/web/components/shared/main/SeatEspecifiedButton.svelte'
+<<<<<<< HEAD
+=======
+import Modal from '@/presentation/web/components/shared/modals/Modal'
+>>>>>>> e5b7a90 (feat(modal): fork for modal branch)
 
 export const prerender = true
 
@@ -271,6 +275,11 @@ const infoCards: InfoCardsProps[] = [
     <!-- FOOTER -->
     <FooterPublic />
 
+<<<<<<< HEAD
+=======
+    <Modal client:load/>
+
+>>>>>>> e5b7a90 (feat(modal): fork for modal branch)
     <script>
         import { mainSeat } from '@/presentation/web/stores/main-seat.store'
         mainSeat.subscribe(value => {

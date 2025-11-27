@@ -6,6 +6,8 @@ import node from '@astrojs/node'
 
 import svelte from '@astrojs/svelte'
 
+import react from '@astrojs/react';
+
 export default defineConfig({
   devToolbar: {
     enabled: false,
@@ -15,7 +17,7 @@ export default defineConfig({
     plugins: [ tailwindcss() ],
   },
 
-  integrations: [ icon(), svelte() ],
+  integrations: [icon(), svelte(), react()],
 
   output: 'static',
   adapter: node({

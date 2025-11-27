@@ -1,6 +1,8 @@
 ---
 import '@/presentation/assets/styles/global.css'
+import { ChangePasswordFirstModal } from '@/presentation/web/components/auth/modals/ChangePasswordFirstModal'
 
+const isFirstLogin = true;
 ---
 
 <!DOCTYPE html>
@@ -728,6 +730,11 @@ import '@/presentation/assets/styles/global.css'
     </style>
 </head>
 <body>
+<<<<<<< HEAD
+=======
+
+    {isFirstLogin && <ChangePasswordFirstModal client:load />}
+>>>>>>> e5b7a90 (feat(modal): fork for modal branch)
     <!-- Header -->
     <header class="header">
         <div class="header-content bg-navy-200/5">
@@ -939,6 +946,18 @@ import '@/presentation/assets/styles/global.css'
         </div-->
 
         <div id="page-perfil" class="page min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+<<<<<<< HEAD
+=======
+            <div class="flex justify-between">
+                <div class="">
+                    <p>Información General</p>
+                </div>
+                <div>
+                    <button class="text-white bg-navy-600 px-4 py-2 rounded">Cambiar Contraseña</button>
+                    <button class="text-white bg-amber-400 px-4 py-2 rounded">Editar</button>
+                </div>
+            </div>
+>>>>>>> e5b7a90 (feat(modal): fork for modal branch)
             <!-- Contenedor principal -->
             <div class="max-w-6xl mx-auto">
                 <!-- Encabezado -->
