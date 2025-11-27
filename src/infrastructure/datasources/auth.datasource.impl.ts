@@ -20,7 +20,7 @@ export class AuthDatasourceImpl implements AuthDataSource {
       console.log({ UserObject })
       const userEntity = UserMapper.entityFromObject(UserObject)
       return userEntity
-    } catch ( error ) {
+    } catch ( error: any ) {
       console.error('Error en signIn:', error);
       if (error.response) {
         console.error('Response data:', error.response.data);
