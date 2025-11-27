@@ -11,9 +11,21 @@ export class AuthDatasourceImpl implements AuthDataSource {
     const uri = '/auth/login'
     try {
       const response = await signInApiClient.post(uri, signInDto)
-      const userEntity = UserMapper.entityFromObject(response.data)
+      //console.log({ response })
+      const UserObject = {
+        id: response.data.user.id,
+        email: response.data.user.email,
+        accessToken: response.data.access_token,
+      }
+      console.log({ UserObject })
+      const userEntity = UserMapper.entityFromObject(UserObject)
       return userEntity
-    } catch ( error ) {
+    } catch ( error: any ) {
+      console.error('Error en signIn:', error);
+      if (error.response) {
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+      }
       throw error
     }
   }

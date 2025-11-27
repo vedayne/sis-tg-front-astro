@@ -14,6 +14,7 @@ export const signInAction = defineAction({
   }),
   handler: async ( input, { cookies } ) => {
     const signInDto = SignInDto.create( input )
+    console.log({ signInDto })
     const signInUseCase = getSignInUseCase()
     const user = await signInUseCase.execute( signInDto )
     console.log({ user })
@@ -23,10 +24,14 @@ export const signInAction = defineAction({
       throw new Error('Token no encontrado')
     }
 
+    const userObject = UserMapper.objectFromEntity(user)
+    console.log({ userObject })
+
     cookies.set('token', token)
 
     return {
       ok: true,
+      data: userObject
     }
   }
 })

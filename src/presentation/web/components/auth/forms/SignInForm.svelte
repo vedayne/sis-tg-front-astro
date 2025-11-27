@@ -27,13 +27,20 @@ const onSubmit = async (event: SubmitEvent) => {
     console.log({ formData })
     console.log('submit')
 
-    const { error } = await actions.signInAction( formData )
+    const { data, error } = await actions.signInAction( formData )
 
     if ( error ) {
       //updateFieldErrors( error )
       console.log({ error })
       return
     }
+
+    console.log({ data })
+    const token = data.data.accessToken
+    if ( !token ) {
+      throw new Error('Token no encontrado')
+    }
+    localStorage.setItem('token', token)
 
     window.location.href = '/admin'
 }
