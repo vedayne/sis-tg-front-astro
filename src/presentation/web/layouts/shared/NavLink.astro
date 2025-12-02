@@ -1,0 +1,42 @@
+---
+interface Props {
+  href: string
+  label: string
+  icon: string
+}
+
+const {
+  href,
+  label,
+  icon,
+} = Astro.props
+const currentPath = Astro.url.pathname
+const isActive = href !== '/' && currentPath.includes(href)
+---
+
+<li>
+  <a
+    href={href}
+    class:list={[
+      "group/link relative flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-all overflow-hidden",
+      "text-slate-700 hover:bg-gold-400/10 hover:text-navy-800",
+      isActive ? "bg-gold-400/15 text-navy-800" : "",
+    ]}
+    aria-current={isActive ? 'page' : undefined}
+  >
+    <div 
+      class:list={[
+        "absolute left-0 top-0 w-1 h-full bg-linear-to-b from-gold-400 to-gold-500 transition-opacity duration-300",
+        isActive ? "opacity-100" : "opacity-0 group-hover/link:opacity-100"
+      ]}
+    ></div>
+
+    <span class="w-6 h-6 shrink-0 flex items-center justify-center text-lg">
+      {icon}
+    </span>
+
+    <span class="whitespace-nowrap transition-all duration-300 opacity-100 group-data-[collapsed=true]/sidebar:opacity-0 group-data-[collapsed=true]/sidebar:w-0 group-data-[collapsed=true]/sidebar:translate-x-4">
+      {label}
+    </span>
+  </a>
+</li>

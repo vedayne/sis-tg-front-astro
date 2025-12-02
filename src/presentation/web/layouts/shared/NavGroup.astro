@@ -1,0 +1,61 @@
+---
+interface Props {
+  label: string;
+  icon: string;
+  id: string; // Para identificar el grupo
+}
+
+const { label, icon, id } = Astro.props;
+const currentPath = Astro.url.pathname;
+
+// Verificamos si algún hijo está activo para abrir el grupo por defecto al cargar
+// Nota: Esto requiere que pases los hijos como slots, Astro no sabe los hijos en build-time fácilmente sin slot.
+// Para simplicidad, usaremos un script pequeño inline para abrirlo si encuentra un link activo dentro.
+---
+
+<li class="mb-2" id={`group-${id}`}>
+  <button
+    class="w-full relative flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-slate-700 font-medium transition-all hover:bg-gold-400/10 hover:text-navy-800 group/btn"
+    onclick={`document.getElementById('submenu-${id}').classList.toggle('hidden'); document.getElementById('arrow-${id}').classList.toggle('rotate-180')`}
+  >
+    <div class="flex items-center gap-3">
+      <span class="w-6 h-6 shrink-0 flex items-center justify-center text-lg">
+        {icon}
+      </span>
+      
+      <span class="whitespace-nowrap transition-all duration-300 opacity-100 group-data-[collapsed=true]/sidebar:opacity-0 group-data-[collapsed=true]/sidebar:w-0">
+        {label}
+      </span>
+    </div>
+
+    {/* Flecha */}
+    <svg 
+      id={`arrow-${id}`}
+      class="w-4 h-4 transition-transform duration-300 group-data-[collapsed=true]/sidebar:hidden" 
+      fill="none" 
+      stroke="currentColor" 
+      viewBox="0 0 24 24"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </button>
+
+  {/* Submenu */}
+  <ul 
+    id={`submenu-${id}`} 
+    class="hidden pl-4 mt-1 space-y-1 bg-navy-900/5 rounded-lg overflow-hidden transition-all group-data-[collapsed=true]/sidebar:hidden"
+  >
+    <slot />
+  </ul>
+</li>
+
+<script define:vars={{ id }}>
+  // Script para mantener abierto el menú si hay un hijo activo
+  const submenu = document.getElementById(`submenu-${id}`);
+  const arrow = document.getElementById(`arrow-${id}`);
+  
+  if (submenu && submenu.querySelector('a[aria-current="page"]')) {
+    submenu.classList.remove('hidden');
+    if(arrow) arrow.classList.add('rotate-180');
+  }
+</script>

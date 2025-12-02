@@ -1,0 +1,1 @@
+export * from './get-defenses.use-case'

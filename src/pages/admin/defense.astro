@@ -1,0 +1,651 @@
+---
+import MenuLayout from "@/presentation/web/layouts/shared/MenuLayout.astro"
+import { actions } from "astro:actions"
+
+const { data } = await Astro.callAction(actions.getDefensesAction, {})
+const defenses = data?.data || []
+const pagination = data?.pagination || {
+  page: 1,
+  limit: 10,
+  total: 0,
+}
+console.log({ data })
+console.log({ data: data?.data })
+console.log({ pagination: data?.pagination })
+
+---
+
+<MenuLayout
+  baseUrl='/admin'
+>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #f0f4fa 0%, #f8fafc 50%, #dbeafe 100%);
+        min-height: 100vh;
+    }
+
+    /* Scrollbar personalizado */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f0f4fa;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #facc15, #eab308);
+        border-radius: 3px;
+    }
+
+    /* Glass effect */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(250, 204, 21, 0.2);
+    }
+
+    /* Tabla responsive */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    /* Checkbox custom */
+    .checkbox-custom:checked {
+        background: linear-gradient(135deg, #facc15, #eab308);
+        border-color: #eab308;
+    }
+
+    /* Select custom */
+    .select-custom {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23334155'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+    }
+
+    /* Animación de entrada */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fadeInUp 0.5s ease-out forwards;
+    }
+
+    /* Hover en filas */
+    .table-row-hover:hover {
+        background: linear-gradient(90deg, rgba(250, 204, 21, 0.08), rgba(255, 255, 255, 0.5));
+    }
+
+    /* Badge styles */
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-weight: 500;
+    }
+
+    /* Pagination button active */
+    .pagination-active {
+        background: linear-gradient(135deg, #facc15, #eab308);
+        color: #0a1d45;
+        font-weight: 600;
+    }
+</style>
+
+  <!-- Contenedor Principal -->
+  <div class="max-w-full mx-auto animate-fade-in p-5">
+        
+    <!-- Card Principal con Glass -->
+    <div class="glass-card rounded-2xl shadow-xl overflow-hidden">
+        
+        <!-- Header de la Tabla -->
+        <div class="p-4 md:p-6 border-b border-navy-200/50">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                
+                <!-- Título -->
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-navy-900">Trabajos de Grado</h1>
+                    <p class="text-slate-400 text-sm mt-1">Gestión y seguimiento de proyectos académicos</p>
+                </div>
+
+                <!-- Acciones Rápidas -->
+                <div class="flex items-center gap-3">
+                    <button class="flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-gold-400 to-gold-500 text-navy-900 font-semibold rounded-xl hover:from-gold-500 hover:to-gold-600 transition-all duration-300 hover:shadow-lg hover:shadow-gold-400/30 hover:-translate-y-0.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        <span class="hidden sm:inline">Nuevo Registro</span>
+                    </button>
+                    <button class="flex items-center gap-2 px-4 py-2.5 bg-navy-800 text-white font-medium rounded-xl hover:bg-navy-900 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                        </svg>
+                        <span class="hidden sm:inline">Exportar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Barra de Búsqueda y Filtros -->
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Búsqueda -->
+                <div class="relative lg:col-span-2">
+                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Buscar por título, autor o tutor..." 
+                        class="w-full pl-12 pr-4 py-3 bg-white/70 border border-navy-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gold-400/50 focus:border-gold-400 transition-all duration-300"
+                    >
+                </div>
+
+                <!-- Filtro Estado -->
+                <div class="relative">
+                    <select id="filterStatus" class="select-custom w-full px-4 py-3 bg-white/70 border border-navy-200 rounded-xl text-slate-700 focus:outline-none focus:ring-2 focus:ring-gold-400/50 focus:border-gold-400 transition-all duration-300 appearance-none cursor-pointer">
+                        <option value="">Todos los estados</option>
+                        <option value="en-progreso">En Progreso</option>
+                        <option value="aprobado">Aprobado</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="rechazado">Rechazado</option>
+                    </select>
+                </div>
+
+                <!-- Filtro Gestión -->
+                <div class="relative">
+                    <select id="filterYear" class="select-custom w-full px-4 py-3 bg-white/70 border border-navy-200 rounded-xl text-slate-700 focus:outline-none focus:ring-2 focus:ring-gold-400/50 focus:border-gold-400 transition-all duration-300 appearance-none cursor-pointer">
+                        <option value="">Todas las gestiones</option>
+                        <option value="2024-1">2024-I</option>
+                        <option value="2024-2">2024-II</option>
+                        <option value="2023-1">2023-I</option>
+                        <option value="2023-2">2023-II</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Filtros Activos -->
+            <div id="activeFilters" class="mt-4 flex flex-wrap gap-2 hidden">
+                <!-- Los tags de filtros activos se agregan dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-container">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-linear-to-r from-navy-800 to-navy-900 text-white">
+                        <th class="px-4 py-4 text-left font-semibold text-sm tracking-wide">
+                            <button class="flex items-center gap-2 hover:text-gold-400 transition-colors sort-btn" data-sort="codigo">
+                                N°
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                </svg>
+                            </button>
+                        </th>
+                        <th class="px-4 py-4 text-left font-semibold text-sm tracking-wide min-w-[250px]">
+                            <button class="flex items-center gap-2 hover:text-gold-400 transition-colors sort-btn" data-sort="titulo">
+                                Fase
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                </svg>
+                            </button>
+                        </th>
+                        <th class="px-4 py-4 text-left font-semibold text-sm tracking-wide">Proyecto</th>
+                        <th class="px-4 py-4 text-left font-semibold text-sm tracking-wide">Estudiante</th>
+                        <th class="px-4 py-4 text-left font-semibold text-sm tracking-wide">Nota Referencial</th>
+                        <th class="px-4 py-4 text-left font-semibold text-sm tracking-wide">Miembro Tribunal</th>
+                        <th class="px-4 py-4 text-left font-semibold text-sm tracking-wide">Observación</th>
+                        <th class="px-4 py-4 text-center font-semibold text-sm tracking-wide">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="divide-y divide-navy-100">
+                    {defenses.map((defense, index) => (
+                        <tr class="table-row-hover transition-all duration-200">
+                <td class="px-4 py-4">
+                    <span class="font-mono text-sm font-semibold text-navy-800">${index}</span>
+                </td>
+                <td class="px-4 py-4">
+                    <div class="max-w-xs">
+                        <p class="font-medium text-navy-900 truncate" title="${defense.phase}">{defense.phase}</p>
+                    </div>
+                </td>
+                <td class="px-4 py-4 text-slate-700">${defense.project}</td>
+                <td class="px-4 py-4 text-slate-700">${defense.student}</td>
+                <td class="px-4 py-4">
+                    <span class="text-sm font-medium text-navy-700">${defense.calification}</span>
+                </td>
+                <td class="px-4 py-4">${defense.courtMember}</td>
+                <td class="px-4 py-4">${defense.observation}</td>
+                <td class="px-4 py-4">
+                    <div class="flex items-center justify-center gap-1">
+                        <button onclick="viewDetails(index)" class="p-2 hover:bg-navy-100 rounded-lg transition-colors group" title="Ver detalles">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-navy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                        <button class="p-2 hover:bg-navy-100 rounded-lg transition-colors group" title="Editar">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </button>
+                        <button class="p-2 hover:bg-red-50 rounded-lg transition-colors group" title="Eliminar">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer de la Tabla: Paginación -->
+        <div class="p-4 md:p-6 border-t border-navy-200/50 bg-white/50">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                
+                <!-- Info de resultados -->
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-slate-700">
+                        Mostrando <span id="showingFrom" class="font-semibold text-navy-900">1</span> - <span id="showingTo" class="font-semibold text-navy-900">10</span> de <span id="totalResults" class="font-semibold text-navy-900">48</span> registros
+                    </span>
+                    <div class="hidden md:flex items-center gap-2">
+                        <span class="text-sm text-slate-400">Mostrar:</span>
+                        <select id="perPage" class="select-custom px-3 py-1.5 bg-white border border-navy-200 rounded-lg text-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-gold-400/50 appearance-none cursor-pointer pr-8">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Paginación -->
+                <div class="flex items-center gap-1">
+                    <button id="prevPage" class="p-2 rounded-lg border border-navy-200 text-slate-700 hover:bg-navy-100 hover:border-gold-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    
+                    <div id="paginationNumbers" class="flex items-center gap-1">
+                        <!-- Números de página se generan dinámicamente -->
+                    </div>
+                    
+                    <button id="nextPage" class="p-2 rounded-lg border border-navy-200 text-slate-700 hover:bg-navy-100 hover:border-gold-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leyenda de Estados -->
+    <div class="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-700">
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+            <span>Aprobado</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+            <span>En Progreso</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+            <span>Pendiente</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500"></span>
+            <span>Rechazado</span>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Detalles -->
+<div id="detailModal" class="fixed inset-0 bg-navy-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="glass-card rounded-2xl shadow-2xl w-full max-w-lg animate-fade-in">
+        <div class="p-6 border-b border-navy-200/50 flex items-center justify-between">
+            <h3 class="text-lg font-bold text-navy-900">Detalles del Trabajo</h3>
+            <button onclick="closeModal()" class="p-2 hover:bg-navy-100 rounded-lg transition-colors">
+                <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div id="modalContent" class="p-6">
+            <!-- Contenido del modal se genera dinámicamente -->
+        </div>
+        <div class="p-6 border-t border-navy-200/50 flex justify-end gap-3">
+            <button onclick="closeModal()" class="px-4 py-2 border border-navy-200 text-slate-700 rounded-xl hover:bg-navy-100 transition-colors">
+                Cerrar
+            </button>
+            <button class="px-4 py-2 bg-linear-to-r from-gold-400 to-gold-500 text-navy-900 font-semibold rounded-xl hover:from-gold-500 hover:to-gold-600 transition-all">
+                Editar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script is:inline>
+    // Datos de ejemplo
+    const data = [
+        { codigo: 'TG-2024-001', titulo: 'Sistema de Gestión Académica con Inteligencia Artificial', autor: 'Juan Carlos Pérez Mendoza', tutor: 'Dr. Roberto Fernández', gestion: '2024-I', estado: 'aprobado' },
+        { codigo: 'TG-2024-002', titulo: 'Aplicación Móvil para Control de Inventarios', autor: 'María Elena Rodríguez', tutor: 'Ing. Carmen López', gestion: '2024-I', estado: 'en-progreso' },
+        { codigo: 'TG-2024-003', titulo: 'Plataforma E-learning con Gamificación', autor: 'Carlos Alberto Mendoza', tutor: 'Dr. Luis García', gestion: '2024-I', estado: 'pendiente' },
+        { codigo: 'TG-2024-004', titulo: 'Sistema de Reconocimiento Facial para Control de Acceso', autor: 'Ana Sofía Vargas', tutor: 'Ing. Pedro Martínez', gestion: '2024-I', estado: 'aprobado' },
+        { codigo: 'TG-2024-005', titulo: 'Red Neuronal para Diagnóstico Médico', autor: 'Diego Fernando Torres', tutor: 'Dra. Patricia Sánchez', gestion: '2024-I', estado: 'rechazado' },
+        { codigo: 'TG-2024-006', titulo: 'Blockchain para Trazabilidad de Productos', autor: 'Laura Camila Herrera', tutor: 'Dr. Miguel Ángel Ruiz', gestion: '2024-II', estado: 'en-progreso' },
+        { codigo: 'TG-2024-007', titulo: 'IoT para Agricultura de Precisión', autor: 'Andrés Felipe Castro', tutor: 'Ing. José Luis Mora', gestion: '2024-II', estado: 'pendiente' },
+        { codigo: 'TG-2024-008', titulo: 'Chatbot con Procesamiento de Lenguaje Natural', autor: 'Valentina Reyes', tutor: 'Dra. Sandra Jiménez', gestion: '2024-II', estado: 'aprobado' },
+        { codigo: 'TG-2023-009', titulo: 'Sistema ERP para Pequeñas Empresas', autor: 'Sebastián Gómez', tutor: 'Ing. Ricardo Varela', gestion: '2023-II', estado: 'aprobado' },
+        { codigo: 'TG-2023-010', titulo: 'Realidad Aumentada para Educación', autor: 'Camila Andrea Díaz', tutor: 'Dr. Fernando Ortiz', gestion: '2023-II', estado: 'aprobado' },
+        { codigo: 'TG-2023-011', titulo: 'Machine Learning para Predicción de Ventas', autor: 'Nicolás Eduardo Parra', tutor: 'Dra. Mónica Ramírez', gestion: '2023-I', estado: 'aprobado' },
+        { codigo: 'TG-2023-012', titulo: 'Aplicación Web Progresiva para Gestión de Proyectos', autor: 'Isabella Muñoz', tutor: 'Ing. Alejandro Suárez', gestion: '2023-I', estado: 'aprobado' },
+    ];
+
+    // Estado de la aplicación
+    let currentPage = 1;
+    let perPage = 10;
+    let filteredData = [...data];
+    let sortColumn = null;
+    let sortDirection = 'asc';
+
+    // Elementos del DOM
+    const tableBody = document.getElementById('tableBody');
+    const searchInput = document.getElementById('searchInput');
+    const filterStatus = document.getElementById('filterStatus');
+    const filterYear = document.getElementById('filterYear');
+    const perPageSelect = document.getElementById('perPage');
+    const selectAll = document.getElementById('selectAll');
+
+    // Función para obtener clase de badge según estado
+    function getStatusBadge(estado) {
+        const badges = {
+            'aprobado': 'bg-emerald-100 text-emerald-700 border border-emerald-200',
+            'en-progreso': 'bg-blue-100 text-blue-700 border border-blue-200',
+            'pendiente': 'bg-amber-100 text-amber-700 border border-amber-200',
+            'rechazado': 'bg-red-100 text-red-700 border border-red-200'
+        };
+        const labels = {
+            'aprobado': 'Aprobado',
+            'en-progreso': 'En Progreso',
+            'pendiente': 'Pendiente',
+            'rechazado': 'Rechazado'
+        };
+        return `<span class="badge ${badges[estado]}">${labels[estado]}</span>`;
+    }
+
+    // Renderizar tabla
+    /*function renderTable() {
+        const start = (currentPage - 1) * perPage;
+        const end = start + perPage;
+        const pageData = filteredData.slice(start, end);
+
+        tableBody.innerHTML = pageData.map((item, index) => `
+            <tr class="table-row-hover transition-all duration-200">
+                <td class="px-4 py-4">
+                    <span class="font-mono text-sm font-semibold text-navy-800">${item.codigo}</span>
+                </td>
+                <td class="px-4 py-4">
+                    <div class="max-w-xs">
+                        <p class="font-medium text-navy-900 truncate" title="${item.titulo}">${item.titulo}</p>
+                    </div>
+                </td>
+                <td class="px-4 py-4 text-slate-700">${item.autor}</td>
+                <td class="px-4 py-4 text-slate-700">${item.tutor}</td>
+                <td class="px-4 py-4">
+                    <span class="text-sm font-medium text-navy-700">${item.gestion}</span>
+                </td>
+                <td class="px-4 py-4">${getStatusBadge(item.estado)}</td>
+                <td class="px-4 py-4">
+                    <div class="flex items-center justify-center gap-1">
+                        <button onclick="viewDetails(${start + index})" class="p-2 hover:bg-navy-100 rounded-lg transition-colors group" title="Ver detalles">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-navy-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                        <button class="p-2 hover:bg-navy-100 rounded-lg transition-colors group" title="Editar">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                        </button>
+                        <button class="p-2 hover:bg-red-50 rounded-lg transition-colors group" title="Eliminar">
+                            <svg class="w-4 h-4 text-slate-400 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+
+        updatePagination();
+    }*/
+
+    // Actualizar paginación
+    function updatePagination() {
+        const totalPages = Math.ceil(filteredData.length / perPage);
+        const start = (currentPage - 1) * perPage + 1;
+        const end = Math.min(currentPage * perPage, filteredData.length);
+
+        document.getElementById('showingFrom').textContent = filteredData.length > 0 ? start : 0;
+        document.getElementById('showingTo').textContent = end;
+        document.getElementById('totalResults').textContent = filteredData.length;
+
+        // Generar números de página
+        const paginationNumbers = document.getElementById('paginationNumbers');
+        let pagesHTML = '';
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                pagesHTML += `
+                    <button onclick="goToPage(${i})" class="w-10 h-10 rounded-lg border border-navy-200 text-slate-700 hover:bg-navy-100 hover:border-gold-400 transition-all duration-300 ${currentPage === i ? 'pagination-active border-gold-400' : ''}">
+                        ${i}
+                    </button>
+                `;
+            } else if (i === currentPage - 2 || i === currentPage + 2) {
+                pagesHTML += `<span class="px-2 text-slate-400">...</span>`;
+            }
+        }
+
+        paginationNumbers.innerHTML = pagesHTML;
+
+        // Habilitar/deshabilitar botones prev/next
+        document.getElementById('prevPage').disabled = currentPage === 1;
+        document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
+    }
+
+    // Filtrar datos
+    function filterData() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusFilter = filterStatus.value;
+        const yearFilter = filterYear.value;
+
+        filteredData = data.filter(item => {
+            const matchesSearch = item.titulo.toLowerCase().includes(searchTerm) ||
+                                 item.autor.toLowerCase().includes(searchTerm) ||
+                                 item.tutor.toLowerCase().includes(searchTerm) ||
+                                 item.codigo.toLowerCase().includes(searchTerm);
+            const matchesStatus = !statusFilter || item.estado === statusFilter;
+            const matchesYear = !yearFilter || item.gestion === yearFilter;
+
+            return matchesSearch && matchesStatus && matchesYear;
+        });
+
+        currentPage = 1;
+        renderTable();
+        updateActiveFilters();
+    }
+
+    // Actualizar filtros activos
+    function updateActiveFilters() {
+        const container = document.getElementById('activeFilters');
+        const filters = [];
+
+        if (searchInput.value) {
+            filters.push({ type: 'search', label: `Búsqueda: "${searchInput.value}"`, clear: () => { searchInput.value = ''; filterData(); } });
+        }
+        if (filterStatus.value) {
+            const labels = { 'en-progreso': 'En Progreso', 'aprobado': 'Aprobado', 'pendiente': 'Pendiente', 'rechazado': 'Rechazado' };
+            filters.push({ type: 'status', label: `Estado: ${labels[filterStatus.value]}`, clear: () => { filterStatus.value = ''; filterData(); } });
+        }
+        if (filterYear.value) {
+            filters.push({ type: 'year', label: `Gestión: ${filterYear.value}`, clear: () => { filterYear.value = ''; filterData(); } });
+        }
+
+        if (filters.length > 0) {
+            container.classList.remove('hidden');
+            container.innerHTML = filters.map(f => `
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-navy-100 text-navy-800 rounded-full text-sm">
+                    ${f.label}
+                    <button onclick="this.parentElement.querySelector('button').dataset.type === '${f.type}' && clearFilter('${f.type}')" class="hover:text-red-500 transition-colors" data-type="${f.type}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </span>
+            `).join('') + `
+                <button onclick="clearAllFilters()" class="text-sm text-red-500 hover:text-red-700 transition-colors font-medium">
+                    Limpiar todos
+                </button>
+            `;
+        } else {
+            container.classList.add('hidden');
+        }
+    }
+
+    function clearFilter(type) {
+        if (type === 'search') searchInput.value = '';
+        if (type === 'status') filterStatus.value = '';
+        if (type === 'year') filterYear.value = '';
+        filterData();
+    }
+
+    function clearAllFilters() {
+        searchInput.value = '';
+        filterStatus.value = '';
+        filterYear.value = '';
+        filterData();
+    }
+
+    // Navegación de páginas
+    function goToPage(page) {
+        currentPage = page;
+        renderTable();
+    }
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderTable();
+        }
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+        const totalPages = Math.ceil(filteredData.length / perPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderTable();
+        }
+    });
+
+    // Ver detalles
+    function viewDetails(index) {
+        const item = filteredData[index];
+        const modal = document.getElementById('detailModal');
+        const content = document.getElementById('modalContent');
+
+        content.innerHTML = `
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm text-slate-400">Código</label>
+                    <p class="font-mono font-semibold text-navy-900">${item.codigo}</p>
+                </div>
+                <div>
+                    <label class="text-sm text-slate-400">Título</label>
+                    <p class="font-medium text-navy-900">${item.titulo}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-slate-400">Autor</label>
+                        <p class="text-slate-700">${item.autor}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm text-slate-400">Tutor</label>
+                        <p class="text-slate-700">${item.tutor}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm text-slate-400">Gestión</label>
+                        <p class="text-slate-700">${item.gestion}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm text-slate-400">Estado</label>
+                        <div class="mt-1">${getStatusBadge(item.estado)}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('detailModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    // Event listeners
+    searchInput.addEventListener('input', filterData);
+    filterStatus.addEventListener('change', filterData);
+    filterYear.addEventListener('change', filterData);
+    perPageSelect.addEventListener('change', (e) => {
+        perPage = parseInt(e.target.value);
+        currentPage = 1;
+        renderTable();
+    });
+
+    /*selectAll.addEventListener('change', (e) => {
+        document.querySelectorAll('.row-checkbox').forEach(cb => {
+            cb.checked = e.target.checked;
+        });
+    });*/
+
+    // Cerrar modal con Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+
+    // Inicializar
+    //renderTable();
+</script>
+</MenuLayout>   
